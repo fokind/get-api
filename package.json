@@ -1,0 +1,27 @@
+{
+  "name": "get-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ."
+  },
+  "author": "Dmitry Fokin",
+  "license": "ISC",
+  "dependencies": {
+    "brain.js": "^1.2.2",
+    "mongodb": "^3.1.1",
+    "rest-request": "^1.0.12",
+    "synaptic": "^1.1.4"
+  },
+  "devDependencies": {
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-config-standard": "^11.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "eslint-plugin-node": "^6.0.1",
+    "eslint-plugin-promise": "^3.8.0",
+    "eslint-plugin-standard": "^3.1.0"
+  }
+}
