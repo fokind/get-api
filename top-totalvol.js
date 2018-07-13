@@ -4,7 +4,7 @@ const rp = require('request-promise');
 module.exports = async () => {
   const dbUri = process.env.DB_URI;
   const dbName = process.env.DB_NAME;
-  const collectionName = 'top-totalvol';
+  const collectionName = 'toptotalvol';
 
   const tsym = 'USD';
   const limit = 2000;

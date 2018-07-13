@@ -1,47 +1,30 @@
 const MongoClient = require('mongodb');
-// const RestRequest = require('rest-request');
 const async = require('async');
 const rp = require('request-promise');
 
 module.exports = async () => {
-  // import { NeuralNetwork } from 'brain.js';
+  // подключиться к бд
+  // получить все валюты для USD
+  // циклом по всем валютам (для соблюдения квоты API)
 
-  // import { Layer, Network } from 'synaptic';
+  const mongoPromise = MongoClient.connect('mongodb://readWrite:readWrite@localhost:27017/crypto', { useNewUrlParser: true });
+  const fsymsPromise = new Promise(resolve => mongoPromise.then((mongo) => {
+    const db = mongo.db('crypto');
+    const collection = db.collection('toptotalvol');
 
-  /* const inputLayer = new Layer(3);
-const hiddenLayer = new Layer(5);
-const outputLayer = new Layer(1); */
+    collection.find().map(e => e.Data).project().toArray((err, toptotalvol) => {
+      const result = toptotalvol
+        .reduce((a, b) => a.concat(b))
+        .filter(e => e.ConversionInfo)
+        .map(e => e.ConversionInfo)
+        .filter(e => e.Conversion === 'direct')
+        .map(e => ({ CurrencyFrom: e.CurrencyFrom, TotalVolume24H: parseInt(e.TotalVolume24H, 10) }))
+        .sort((a, b) => a.TotalVolume24H - b.TotalVolume24H);
 
-  /* inputLayer.project(hiddenLayer);
-hiddenLayer.project(outputLayer); */
-
-  /* const myNetwork = new Network({
-  input: inputLayer,
-  hidden: [hiddenLayer],
-  output: outputLayer,
-}); */
-
-  // const learningRate = 0.3;
-
-  /* const config = {
-}; */
-  // create a simple recurrent neural network
-  // var net = new brain.recurrent.LSTM(config);
-  // const net = new NeuralNetwork(config);
-
-  /* const load = async () => {
-  const a = await Promise.resolve(5);
-  const b = await Promise.resolve(10);
-  return a + b;
-}; */
-
-  // сбор статистики
-  /* const restApi = new RestRequest('https://min-api.cryptocompare.com/data');
-const histodayPromise = restApi.get('histoday', {
-  fsym: 'BTC',
-  tsym: 'USD',
-  limit: 2000,
-}); */
+      console.log(result);
+      resolve(null, toptotalvol);
+    });// .map(doc => doc.Data);
+}));
 
   const fsym = 'BTC';
   const tsym = 'USD';
@@ -67,7 +50,6 @@ const histodayPromise = restApi.get('histoday', {
 load().then(value => console.log(value)); // 15 */
 
 
-  const mongoPromise = MongoClient.connect('mongodb://readWrite:readWrite@localhost:27017/crypto', { useNewUrlParser: true });
   // здесь должна быть подготовка базы данных к загрузке, удаление устаревших документов
 
   let count = 0;
@@ -96,7 +78,7 @@ load().then(value => console.log(value)); // 15 */
 
       const apiPromise = rp(options);
       Promise.all([mongoPromise, apiPromise]).then((values) => {
-      // весь полученный документ отправить в монго как есть добавив гет параметры
+        // весь полученный документ отправить в монго как есть добавив гет параметры
         const mongo = values[0];
         const body = JSON.parse(values[1]);
         const data = body.Data;
